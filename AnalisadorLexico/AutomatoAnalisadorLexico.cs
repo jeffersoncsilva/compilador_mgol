@@ -2,175 +2,167 @@
 
 internal class AutomatoAnalisadorLexico
 {
-    private int[,] afd = new int[25, 21];
+    private int[,] afd = new int[25, 24];
     private int linha_atual = 0;
+    public int EstadoAtual { get { return this.linha_atual; } }
 
     public AutomatoAnalisadorLexico()
     {
         InicializaValoresVaziosAfd();
-        InicializaValoresDeCadaLinha();
         InicializaValoresDasColunas();
     }
 
     private void InicializaValoresDasColunas()
     {
-        afd[0, 1] = 1;
-        afd[0, 2] = 7;
-        afd[0, 9] = 8;
-        afd[0, 10] = 9;
-        afd[1, 1] = 1;
-        afd[1, 5] = 4;
-        afd[1, 6] = 4;
-        afd[1, 7] = 2;
+        InicializaEstadoQ0();
+        InicializaEstadoQ1();
         afd[2, 1] = 3;
-        afd[3, 1] = 3;
-        afd[3, 5] = 4;
-        afd[3, 6] = 4;
-        afd[4, 1] = 6;
-        afd[4, 3] = 5;
-        afd[4, 4] = 5;
-        afd[5, 1] = 6;
-        afd[6, 1] = 6;
-        afd[7, 1] = 7;
-        afd[7, 2] = 7;
-        afd[7, 8] = 7;
+        InicializaEstadoQ3();
+        InicializaEstadoQ4();
+        InicializaEstadoQ5();
+        InicializaEstadoQ6();
+        InicializaestadoQ7();
+        InicializaEstadoQ11();
+        InicializaEstadoQ14();
+        InicializaEstadoQ17();
+        InicializaEstadoQ20();
 
-        //q0
-        //afd[1, 0] = (char)2;
-        //afd[1, 1] = (char)9;
-        //afd[1, 5] = (char)24;
-        //afd[1, 6] = (char)24;
-        //afd[1, 9] = (char)22;
-        //afd[1, 10] = (char)24;
-        //afd[1, 11] = (char)24;
-        //afd[1, 12] = (char)14;
-        //afd[1, 13] = (char)17;
-        //afd[1, 14] = (char)19;
-        //afd[1, 16] = (char)13;
-        //afd[1, 18] = (char)18;
-        //afd[1, 19] = (char)11;
-        //afd[1, 20] = (char)25;
+        void InicializaEstadoQ20()
+        {
+            afd[20, 1] = 20;
+            afd[20, 2] = 20;
+            afd[20, 3] = 20;
+            afd[20, 4] = 20;
+            afd[20, 5] = 20;
+            afd[20, 6] = 20;
+            afd[20, 7] = 20;
+            afd[20, 8] = 20;
+            afd[20, 9] = 20;
+            afd[20, 10] = 20;
+            afd[20, 11] = 20;
+            afd[20, 12] = 20;
+            afd[20, 13] = 20;
+            afd[20, 14] = 20;
+            afd[20, 15] = 20;
+            afd[20, 16] = 21;
+            afd[20, 17] = 20;
+            afd[20, 18] = 20;
+            afd[20, 19] = 20;
+            afd[20, 20] = 20;
+            afd[20, 21] = 20;
+            afd[20, 22] = 20;
+            afd[20, 23] = 20;
 
-        ////q2
-        //afd[0, 2] = (char)2;
-        //afd[2, 2] = (char)3;
+        }
 
+        void InicializaEstadoQ14()
+        {
+            afd[14, 4] = 19;
+            afd[14, 13] = 16;
+            afd[14, 15] = 15;
+        }
 
-        //afd[0, 3] = (char)4;//q3
-        //afd[3, 4] = (char)5;//q4
-        //afd[4, 4] = (char)5;//q4
+        void InicializaEstadoQ11()
+        {
+            afd[11, 1] = 11;
+            afd[11, 2] = 11;
+            afd[11, 3] = 11;
+            afd[11, 4] = 11;
+            afd[11, 5] = 11;
+            afd[11, 6] = 11;
+            afd[11, 7] = 11;
+            afd[11, 8] = 11;
+            afd[11, 9] = 11;
+            afd[11, 10] = 11;
+            afd[11, 11] = 11;
+            afd[11, 12] = 12;
+            afd[11, 13] = 11;
+            afd[11, 14] = 11;
+            afd[11, 15] = 11;
+            afd[11, 16] = 11;
+            afd[11, 17] = 11;
+            afd[11, 18] = 11;
+            afd[11, 19] = 11;
+            afd[11, 20] = 11;
+            afd[11, 21] = 11;
+        }
 
+        void InicializaestadoQ7()
+        {
+            afd[7, 1] = 7;
+            afd[7, 2] = 7;
+            afd[7, 8] = 7;
+        }
 
-        //afd[0, 5] = (char)7;//q5
-        //afd[5, 5] = (char)6;//q5
-        //afd[6, 5] = (char)6;//q5
+        void InicializaEstadoQ17()
+        {
+            afd[17, 13] = 18;
+        }
 
-        //afd[0, 6] = (char)7;//q6
-        //afd[0, 7] = (char)8;//q7
+        void InicializaEstadoQ6()
+        {
+            afd[6, 1] = 6;
+        }
 
-        //afd[0, 9] = (char)9;//q9
-        //afd[1, 9] = (char)9;//q9
-        //afd[7, 9] = (char)9;//q9
+        void InicializaEstadoQ5()
+        {
+            afd[5, 1] = 6;
+        }
 
-        //afd[2, 13] = (char)20;//q13
+        void InicializaEstadoQ4()
+        {
+            afd[4, 1] = 6;
+            afd[4, 3] = 5;
+            afd[4, 4] = 5;
+        }
 
-        //afd[13, 14] = (char)15;//q14
-        //afd[14, 14] = (char)16;//q14
-        //afd[15, 14] = (char)25;//q14
+        void InicializaEstadoQ3()
+        {
+            afd[3, 1] = 3;
+            afd[3, 5] = 4;
+            afd[3, 6] = 4;
+        }
 
-        //afd[14, 17] = (char)18;//q17
+        void InicializaEstadoQ1()
+        {
+            afd[1, 1] = 1;
+            afd[1, 5] = 4;
+            afd[1, 6] = 4;
+            afd[1, 7] = 2;
+        }
 
-        //afd[8, 23] = (char)23;//q23
-
-        //afd[0, 20] = (char)20;//q20
-        //afd[1, 20] = (char)20;//q20
-        //afd[2, 20] = (char)20;//q20
-        //afd[3, 20] = (char)20;//q20
-        //afd[4, 20] = (char)20;//q20
-        //afd[5, 20] = (char)20;//q20
-        //afd[6, 20] = (char)20;//q20
-        //afd[7, 20] = (char)20;//q20
-        //afd[8, 20] = (char)20;//q20
-        //afd[9, 20] = (char)20;//q20
-        //afd[10, 20] = (char)20;//q20
-        //afd[11, 20] = (char)20;//q20
-        //afd[12, 20] = (char)20;//q20
-        //afd[13, 20] = (char)20;//q20
-        //afd[14, 20] = (char)20;//q20
-        //afd[15, 20] = (char)20;//q20
-        //afd[16, 20] = (char)20;//q20
-        //afd[17, 20] = (char)21;//q20
-
-        //afd[1, 26] = (char)26;//q26
-        //afd[2, 26] = (char)26;//q26
-        //afd[3, 26] = (char)26;//q26
-        //afd[4, 26] = (char)26;//q26
-        //afd[5, 26] = (char)26;//q26
-        //afd[6, 26] = (char)26;//q26
-        //afd[7, 26] = (char)26;//q26
-        //afd[8, 26] = (char)26;//q26
-        //afd[9, 26] = (char)26;//q26
-        //afd[10, 26] = (char)26;//q26
-        //afd[11, 26] = (char)26;//q26
-        //afd[12, 26] = (char)26;//q26
-        //afd[13, 26] = (char)26;//q26
-        //afd[14, 26] = (char)26;//q26
-        //afd[15, 26] = (char)26;//q26
-        //afd[16, 26] = (char)26;//q26
-        //afd[17, 26] = (char)26;//q26
-        //afd[18, 26] = (char)27;//q26
-    }
-
-    private void InicializaValoresDeCadaLinha()
-    {
-        //afd[0, 0] = 'd';
-        //afd[1, 0] = 'l';
-        //afd[2, 0] = '.';
-        //afd[3, 0] = 'e';
-        //afd[4, 0] = 'E';
-        //afd[5, 0] = '+';
-        //afd[6, 0] = '-';
-        //afd[7, 0] = '_';
-        //afd[8, 0] = ';';
-        //afd[9, 0] = ',';
-        //afd[10, 0] = '/';
-        //afd[11, 0] = '*';
-        //afd[12, 0] = '<';
-        //afd[13, 0] = '>';
-        //afd[14, 0] = '=';
-        //afd[15, 0] = '-';
-        //afd[16, 0] = '{';
-        //afd[17, 0] = '}';
-        //afd[18, 0] = '"';
-        //afd[19, 0] = '(';
-        //afd[20, 0] = ')';
+        void InicializaEstadoQ0()
+        {
+            afd[0, 1] = 1;
+            afd[0, 2] = 7;
+            afd[0, 3] = 24;
+            afd[0, 4] = 24;
+            afd[0, 9] = 8;
+            afd[0, 10] = 9;
+            afd[0, 11] = 11;
+            afd[0, 13] = 13;
+            afd[0, 14] = 14;
+            afd[0, 15] = 17;
+            afd[0, 16] = 20;
+            afd[0, 17] = 22;
+            afd[0, 18] = 23;
+            afd[0, 19] = 24;
+            afd[0, 20] = 24;
+        }
     }
 
     private void InicializaValoresVaziosAfd()
     {
         for (int i = 0; i < afd.GetLength(0); i++)
-        {
             for (int j = 0; j < afd.GetLength(1); j++)
-            {
                 afd[i, j] = -1;
-            }
-        }
     }
 
-    internal bool CaractereValido(char caracterAtual)
+    public bool CaractereValido(char caracterAtual)
     {
         if (char.IsDigit(caracterAtual))
-        {
-            if (afd[linha_atual, 1] == -1)
-            {
-                return false;
-            }
-            else
-            {
-                linha_atual = afd[linha_atual, 1];
-                return true;
-            }
-        }
+            return TrataCaracteresEspeciais(1);
+     
         else if (char.IsLetter(caracterAtual))
         {
             if (caracterAtual.ToString().ToLower().Equals("e"))
@@ -181,44 +173,63 @@ internal class AutomatoAnalisadorLexico
                     return true;
                 }
             }
-            if (afd[linha_atual, 2] == -1)
-            {
-                return false;
-            }
-            linha_atual = afd[linha_atual, 2];
-            return true;
+            return TrataCaracteresEspeciais(2);
         }
-        //else if(caracterAtual == '\0' || char.IsWhiteSpace(caracterAtual))
-        //{
-        //    return false;
-        //}
-        else if (caracterAtual == '+' || caracterAtual == '-')
+
+        switch (caracterAtual)
         {
-            linha_atual = afd[linha_atual, 3];
-            return true;
-        }
-        else if (caracterAtual == '(')
-        {
-            if (afd[linha_atual, 9] == -1)
-                return false;
-            linha_atual = afd[linha_atual, 9];
-            return true;
-        }
-        else if (caracterAtual == ')')
-        {
-            if (afd[linha_atual, 10] == -1)
-                return false;
-            linha_atual = afd[linha_atual, 10];
-            return true;
+            case '+':
+                return TrataCaracteresEspeciais(3);
+            case '-':
+                return TrataCaracteresEspeciais(4);
+            case '\\':
+                return TrataCaracteresEspeciais(20);
+            case '*':
+                return TrataCaracteresEspeciais(25);
+            case '(':
+                return TrataCaracteresEspeciais(9);
+            case ')':
+                return TrataCaracteresEspeciais(10);
+            case '=':
+                return TrataCaracteresEspeciais(13);
+            case '>':
+                return TrataCaracteresEspeciais(15);
+            case '<':
+                return TrataCaracteresEspeciais(14);
+            case '"':
+                return TrataCaracteresEspeciais(16);
+            case ',':
+                return TrataCaracteresEspeciais(17);
+            case '.':
+                return TrataCaracteresEspeciais(7);
+            case ';':
+                return TrataCaracteresEspeciais(18);
+            case ':':
+                return TrataCaracteresEspeciais(21);
+            case '{':
+                return TrataCaracteresEspeciais(11);
+            case '}':
+                return TrataCaracteresEspeciais(12);
+            case '!':
+                return TrataCaracteresEspeciais(22);
+            case '?':
+                return TrataCaracteresEspeciais(23);
         }
         return false;
     }
 
-    internal void ReiniciaEstado()
+    private bool NaoExisteTransicaoLinhaAtualParaColuna(int coluna) => afd[linha_atual, coluna] == -1;
+
+    private bool TrataCaracteresEspeciais(int coluna_do_caractere)
+    {
+        if (NaoExisteTransicaoLinhaAtualParaColuna(coluna_do_caractere))
+            return false;
+        linha_atual = afd[linha_atual, coluna_do_caractere];
+        return true;
+    }
+    
+    public void ReiniciaEstado()
     {
         this.linha_atual = 0;
     }
-
-    public int EstadoAtual { get { return this.linha_atual; } }
-
 }

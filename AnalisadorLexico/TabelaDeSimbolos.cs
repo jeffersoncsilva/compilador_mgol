@@ -24,9 +24,9 @@ namespace AnalisadorLexico
 
         }
 
-        public Token? BuscaSimbolo()
+        public Token BuscaSimbolo(Token tk)
         {
-            return null;
+            return tokens.Where(t => t.Lexema == tk.Lexema).FirstOrDefault();
         }
 
         private void AdicionaPalavrasReservadasNaTabela()

@@ -5,18 +5,22 @@ namespace AnalisadorLexico
 {
     public class Lexico
     {
+        private const string EOF = "/EOF";
         private readonly string PATH_FONTE;
         private StreamReader reader;
-        private char[] linhaAtual;
-        private int idxCaractereAtual = 0;
         private AutomatoAnalisadorLexico afd;
         private TabelaDeSimbolos tabelaDeSimbolos;
 
         public bool EndOfFile { get; private set; }
 
+        private string[] linha;
+        private string palavra_atual;
+        private int idxPalavraParaLer = 0;
+        private int idxCaractererPalavraAtual = 0;
+
         public Lexico(string filePath)
         {
-            PATH_FONTE= filePath;
+            PATH_FONTE = filePath;
             InicializaLeituraArquivo();
             afd = new();
             tabelaDeSimbolos = new();
@@ -25,114 +29,153 @@ namespace AnalisadorLexico
         public Token Scanner()
         {
             StringBuilder caracteresLidos = new StringBuilder();
-            char caracterAtual;
-            do
-            {                
-                caracterAtual = LeProximoCaractere();
-                if (caracterAtual == '\0' || char.IsWhiteSpace(caracterAtual))
-                {
-                    idxCaractereAtual++;
-                    continue;
-                }
+            if (JaLeuTodaLinha() && JaLiTodaPalavraAtual())
+            {
+                linha = LeProximaLinha();
+            }
+            if (JaLiTodaPalavraAtual())
+                palavra_atual = LeProximaPalavra();
+            if (ChegouAoFimDoArquivo())
+            {
+                EndOfFile = true;
+                return new Token(EOF);
+            }
 
-                if (afd.CaractereValido(caracterAtual))
+            while (idxCaractererPalavraAtual < palavra_atual.Length)
+            {
+                char caractere = palavra_atual[idxCaractererPalavraAtual];
+                if (afd.CaractereValido(caractere))
                 {
-                    caracteresLidos.Append(caracterAtual);
-                    idxCaractereAtual++;
+                    caracteresLidos.Append(caractere);
+                    idxCaractererPalavraAtual++;
                 }
                 else
                 {
-                    Token tk = CriarToken(caracteresLidos.ToString());
-                    afd.ReiniciaEstado();
-                    tabelaDeSimbolos.InsereSimbolo(tk);
-                    return tk;
+                    if (caracteresLidos.ToString().Length == 0)
+                    {
+                        idxCaractererPalavraAtual++;
+                        return RetornaTokenCriado($"{caractere}");
+                    }
+                    return RetornaTokenCriado(caracteresLidos.ToString());
                 }
-            } while (!EndOfFile);
-            return new("ERROR");
+                if (idxCaractererPalavraAtual == palavra_atual.Length && EstaLendoLiteralOuComentario())
+                {
+                    palavra_atual = LeProximaPalavra();
+                    caracteresLidos.Append(" ");
+                    idxCaractererPalavraAtual = 0;
+                }
+            }
+            return RetornaTokenCriado(caracteresLidos.ToString());
+
+            bool EstaLendoLiteralOuComentario()
+            {
+                return (afd.EstadoAtual == 11 || afd.EstadoAtual == 20);
+            }
+        }
+        private bool PalavraAtualEVaziaOuEspacoEmBranco(string palavra)
+        {
+            return palavra.Length == 0;
         }
 
-        private Token CriarToken(string caracteres)
-        {           
+        private string LeProximaPalavra()
+        {
+            if (idxPalavraParaLer >= linha.Length)
+                linha = LeProximaLinha();
+            idxCaractererPalavraAtual = 0;
+            string word = linha[idxPalavraParaLer++];
+            if (PalavraAtualEVaziaOuEspacoEmBranco(word))
+                word = LeProximaPalavra();
+            return word;
+        }
+
+        private bool ChegouAoFimDoArquivo()
+        {
+            return EOF.Equals(linha[0]);
+        }
+        
+        private Token RetornaTokenCriado(string lexema)
+        {
+            Token tk2 = CriarToken(lexema);
+            afd.ReiniciaEstado();
+            Token tb_tk = tabelaDeSimbolos.BuscaSimbolo(tk2);
+            if (tb_tk.EValido())
+                return tb_tk;
+            else
+            {
+                tabelaDeSimbolos.InsereSimbolo(tk2);
+                return tk2;
+            }
+        }
+
+        private bool JaLiTodaPalavraAtual()
+        {
+            if (palavra_atual == null)
+                return true;
+            if (idxCaractererPalavraAtual == palavra_atual.Length)
+                return true;
+            if (string.Empty.Equals(palavra_atual))
+                return true;
+            return false;
+        }
+
+        private bool JaLeuTodaLinha()
+        {
+            if (linha == null)
+                return true;
+
+            return idxPalavraParaLer == linha.Length;
+        }
+
+        private Token CriarToken(string lexema)
+        {
             switch (afd.EstadoAtual)
             {
                 case 1:
                 case 2:
                 case 3:
-                    return new Token("NUM", caracteres, "inteiro");
+                case 6:
+                    return new Token("NUM", lexema, "inteiro");
                 case 7:
-                    return new Token("id", caracteres, "NULO");
+                    return new Token("id", lexema, "NULO");
                 case 8:
-                    return new Token("AB_P", caracteres, "NULO");
+                    return new Token("AB_P", lexema, "NULO");
                 case 9:
-                    return new Token("FC_P", caracteres, "NULO");
-            }
-
-            //if (afd.EstadoAtual == 1 || afd.EstadoAtual == 3 || afd.EstadoAtual == 6)
-            //{
+                    return new Token("FC_P", lexema, "NULO");
+                case 12:
+                    afd.ReiniciaEstado();
+                    return Scanner();
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                    return new Token("OPR", lexema, "NULO");
+                case 21:
+                    return new Token("LIT", lexema, "NULO");
+                case 22:
+                    return new Token("VIR", lexema, "NULO");
+                case 23:
+                    return new Token("PT_V", lexema, "NULO");
+                case 24:
+                    return new Token("OPR", lexema, "NULO");
                 
-            //}
-            //else if(afd.EstadoAtual == 7)
-            //{
-            //    return new Token("id", caracteres, "NULO");
-            //}else if(afd.EstadoAtual == 8)
-            //{
-
-            //    return new Token("AB_P", caracteres, "NULO");
-            //}
-            return new("ERROR", caracteres, "NULO");
+                default:
+                    return new Token("ERROR", lexema, "ERROR");
+            }
         }
 
-        private char LeProximoCaractere()
-        {
-            //if(linhaAtual == null)
-            //    linhaAtual = LeProximaLinha();
-
-            //if (idxCaractereAtual == linhaAtual.Length) 
-            //{ 
-            //    idxCaractereAtual++;
-            //    return '\0';
-            //}
-
-            //if(idxCaractereAtual >= linhaAtual.Length)
-            //{
-            //    idxCaractereAtual = 0;
-            //    linhaAtual = LeProximaLinha();
-            //}
-            if (LinhaEstaVazia())
-            {
-                linhaAtual = LeProximaLinha();
-                idxCaractereAtual = 0;
-            }         
-            return linhaAtual[idxCaractereAtual];
-        }
-
-        private bool LinhaEstaVazia()
-        {
-            if (linhaAtual == null)
-                return true;
-            if(idxCaractereAtual >= linhaAtual.Length) 
-                return true;
-            return false;
-        }
-
-        private char[] LeProximaLinha()
+        private string[] LeProximaLinha()
         {
             var line = reader.ReadLine();
-            //if(line == null)
-            //{
-            //    EndOfFile = true;
-            //    return new char[1] {'\n'};
-            //}
-            if(line == null)
+            idxPalavraParaLer = 0;
+            if (line == null)
             {
-                EndOfFile = (line == null);
-                return new char[1] {null};
+                EndOfFile = true;
+                return new string[1] { "/EOF" };
             }
-            if (line.Length == 0)
-            {
-                return new char[1] { '\n' };
-            }
-            return line.ToCharArray();
+            return line.Split(' ');
         }
 
         private void InicializaLeituraArquivo()
