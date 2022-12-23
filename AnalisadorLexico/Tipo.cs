@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace AnalisadorLexico;
 
-namespace AnalisadorLexico
+public enum Tipo
 {
-    public enum Tipo
-    {
-        INTEIRO, REAL, LITERAL
-    }
+    INTEIRO, REAL, LITERAL, PALAVRA_RES, NULO,
+    ERROR
 }

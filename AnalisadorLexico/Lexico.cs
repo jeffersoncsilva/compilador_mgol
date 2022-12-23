@@ -14,6 +14,7 @@ namespace AnalisadorLexico
         public bool EndOfFile { get; private set; }
 
         private string[] linha;
+        private int numero_linha = 0;
         private string palavra_atual;
         private int idxPalavraParaLer = 0;
         private int idxCaractererPalavraAtual = 0;
@@ -38,7 +39,7 @@ namespace AnalisadorLexico
             if (ChegouAoFimDoArquivo())
             {
                 EndOfFile = true;
-                return new Token(EOF);
+                return new Token(Classe.NULO, EOF, Tipo.NULO);
             }
 
             while (idxCaractererPalavraAtual < palavra_atual.Length)
@@ -72,6 +73,7 @@ namespace AnalisadorLexico
                 return (afd.EstadoAtual == 11 || afd.EstadoAtual == 20);
             }
         }
+
         private bool PalavraAtualEVaziaOuEspacoEmBranco(string palavra)
         {
             return palavra.Length == 0;
@@ -97,14 +99,16 @@ namespace AnalisadorLexico
         {
             Token tk2 = CriarToken(lexema);
             afd.ReiniciaEstado();
-            Token tb_tk = tabelaDeSimbolos.BuscaSimbolo(tk2);
-            if (tb_tk.EValido())
-                return tb_tk;
-            else
+            try
             {
-                tabelaDeSimbolos.InsereSimbolo(tk2);
-                return tk2;
+                Token tb_tk = tabelaDeSimbolos.BuscaSimbolo(tk2);
+                return tb_tk;
+            }catch(TokenNaoEncontradoException ex)
+            {
+                if(tk2.Classe == Classe.ID)
+                    tabelaDeSimbolos.InsereSimbolo(tk2);
             }
+            return tk2;
         }
 
         private bool JaLiTodaPalavraAtual()
@@ -130,17 +134,18 @@ namespace AnalisadorLexico
         {
             switch (afd.EstadoAtual)
             {
-                case 1:
                 case 2:
+                    return ErroEntradaInvalida(lexema);
+                case 1:
                 case 3:
                 case 6:
-                    return new Token("NUM", lexema, "inteiro");
+                    return new Token(Classe.NUM, lexema, Tipo.INTEIRO);
                 case 7:
-                    return new Token("id", lexema, "NULO");
+                    return new Token(Classe.ID, lexema, Tipo.NULO);
                 case 8:
-                    return new Token("AB_P", lexema, "NULO");
+                    return new Token(Classe.AB_P, lexema, Tipo.NULO);
                 case 9:
-                    return new Token("FC_P", lexema, "NULO");
+                    return new Token(Classe.FC_P, lexema, Tipo.NULO);
                 case 12:
                     afd.ReiniciaEstado();
                     return Scanner();
@@ -151,25 +156,39 @@ namespace AnalisadorLexico
                 case 17:
                 case 18:
                 case 19:
-                    return new Token("OPR", lexema, "NULO");
+                    return new Token(Classe.OPR, lexema, Tipo.NULO);
                 case 21:
-                    return new Token("LIT", lexema, "NULO");
+                    return new Token(Classe.LIT, lexema, Tipo.NULO);
                 case 22:
-                    return new Token("VIR", lexema, "NULO");
+                    return new Token(Classe.VIR, lexema, Tipo.NULO);
                 case 23:
-                    return new Token("PT_V", lexema, "NULO");
+                    return new Token(Classe.PT_V, lexema, Tipo.NULO);
                 case 24:
-                    return new Token("OPR", lexema, "NULO");
+                    return new Token(Classe.OPR, lexema, Tipo.NULO);
                 
                 default:
-                    return new Token("ERROR", lexema, "ERROR");
+                    return MensagemDeErroPadrao(lexema);
             }
+        }
+
+        private Token MensagemDeErroPadrao(string lexema)
+        {
+            string str = $"{lexema} - Caractere não reconhecido, linha {numero_linha} coluna {idxCaractererPalavraAtual+1}";
+            return new Token(Classe.ERRO, str, Tipo.ERROR);
+        }
+
+        private Token ErroEntradaInvalida(string lexema)
+        {
+            string str = $"{lexema} - caracteres mal formados, linha {numero_linha} coluna {idxCaractererPalavraAtual+1}";
+            var tk = new Token(Classe.ERRO, str, Tipo.ERROR);          
+            return tk;
         }
 
         private string[] LeProximaLinha()
         {
             var line = reader.ReadLine();
             idxPalavraParaLer = 0;
+            numero_linha++;
             if (line == null)
             {
                 EndOfFile = true;
@@ -185,6 +204,13 @@ namespace AnalisadorLexico
 
             var stream = new FileStream(PATH_FONTE, FileMode.Open);
             this.reader = new StreamReader(stream);
+        }
+
+        public void ImprimeTabelaDeSimbolos()
+        {
+            Console.WriteLine("------------Tabela de Simbolos--------");
+            Console.WriteLine(tabelaDeSimbolos.ToString());
+            Console.WriteLine("---------------------------------------");
         }
     }
 }
