@@ -1,12 +1,14 @@
-﻿using AnalisadorLexico.Exceptions;
+﻿using CompiladorMGol.A_Lexico;
+using CompiladorMGol.Exceptions;
+using System.Reflection;
 using System.Text;
 
-namespace AnalisadorLexico
+namespace CompiladorMgol.Common
 {
     public class Lexico
     {
         private const string EOF = "/EOF";
-        private readonly string PATH_FONTE;
+        
         private StreamReader reader;
         private AutomatoAnalisadorLexico afd;
         private TabelaDeSimbolos tabelaDeSimbolos;
@@ -19,9 +21,8 @@ namespace AnalisadorLexico
         private int idxPalavraParaLer = 0;
         private int idxCaractererPalavraAtual = 0;
 
-        public Lexico(string filePath)
+        public Lexico()
         {
-            PATH_FONTE = filePath;
             InicializaLeituraArquivo();
             afd = new();
             tabelaDeSimbolos = new();
@@ -39,7 +40,7 @@ namespace AnalisadorLexico
             if (ChegouAoFimDoArquivo())
             {
                 EndOfFile = true;
-                return new Token(Classe.NULO, EOF, Tipo.NULO);
+                return new Token("$");
             }
 
             while (idxCaractererPalavraAtual < palavra_atual.Length)
@@ -70,10 +71,10 @@ namespace AnalisadorLexico
 
             bool EstaLendoLiteralOuComentario()
             {
-                return (afd.EstadoAtual == 11 || afd.EstadoAtual == 20);
+                return afd.EstadoAtual == 11 || afd.EstadoAtual == 20;
             }
         }
-
+        
         private bool PalavraAtualEVaziaOuEspacoEmBranco(string palavra)
         {
             return palavra.Length == 0;
@@ -94,7 +95,7 @@ namespace AnalisadorLexico
         {
             return EOF.Equals(linha[0]);
         }
-        
+
         private Token RetornaTokenCriado(string lexema)
         {
             Token tk2 = CriarToken(lexema);
@@ -139,13 +140,13 @@ namespace AnalisadorLexico
                 case 1:
                 case 3:
                 case 6:
-                    return new Token(Classe.NUM, lexema, Tipo.INTEIRO);
+                    return new Token("num", lexema, "inteiro");
                 case 7:
                     return new Token(Classe.ID, lexema, Tipo.NULO);
                 case 8:
-                    return new Token(Classe.AB_P, lexema, Tipo.NULO);
+                    return new Token("ab_p", lexema, "NULO");
                 case 9:
-                    return new Token(Classe.FC_P, lexema, Tipo.NULO);
+                    return new Token("fc_p", lexema, "NULO");
                 case 12:
                     afd.ReiniciaEstado();
                     return Scanner();
@@ -155,17 +156,18 @@ namespace AnalisadorLexico
                 case 16:
                 case 17:
                 case 18:
+                    return new Token("opr", lexema, "NULO");
                 case 19:
-                    return new Token(Classe.OPR, lexema, Tipo.NULO);
+                    return new Token("atr", lexema, "NULO");
                 case 21:
-                    return new Token(Classe.LIT, lexema, Tipo.NULO);
+                    return new Token("lit", lexema, "NULO");
                 case 22:
-                    return new Token(Classe.VIR, lexema, Tipo.NULO);
+                    return new Token("vir", lexema, "NULO");
                 case 23:
-                    return new Token(Classe.PT_V, lexema, Tipo.NULO);
+                    return new Token("pt_v", lexema, "NULO");
                 case 24:
-                    return new Token(Classe.OPR, lexema, Tipo.NULO);
-                
+                    return new Token("opa", lexema, "NULO");
+
                 default:
                     return MensagemDeErroPadrao(lexema);
             }
@@ -199,11 +201,10 @@ namespace AnalisadorLexico
 
         private void InicializaLeituraArquivo()
         {
-            if (!File.Exists(PATH_FONTE))
-                throw new ArquivoFonteNaoEncontradoException($"Arquivo no caminho: {PATH_FONTE} não foi encontrado.");
-
-            var stream = new FileStream(PATH_FONTE, FileMode.Open);
-            this.reader = new StreamReader(stream);
+            var nomeArquivoCompleto = "CompiladorMgol.Recursos.programa_mgol.txt";
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceStream = assembly.GetManifestResourceStream(nomeArquivoCompleto);
+            reader = new StreamReader(resourceStream);
         }
 
         public void ImprimeTabelaDeSimbolos()

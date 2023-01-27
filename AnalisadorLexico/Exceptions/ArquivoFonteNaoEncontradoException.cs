@@ -1,5 +1,5 @@
 ﻿
-namespace AnalisadorLexico.Exceptions
+namespace CompiladorMGol.Exceptions
 {
     public class ArquivoFonteNaoEncontradoException : Exception
     {

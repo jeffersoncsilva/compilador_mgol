@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AnalisadorLexico.Exceptions
+namespace CompiladorMGol.Exceptions
 {
     public class InicializacaoDeTokenComNuloException : Exception
     {

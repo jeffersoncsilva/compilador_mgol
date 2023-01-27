@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compilador Mgol", "Compilador Mgol\Compilador Mgol.csproj", "{51199DC0-D7E4-48AF-8BE7-F5DB5F202ECA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InterfaceCompilador", "Compilador Mgol\InterfaceCompilador.csproj", "{51199DC0-D7E4-48AF-8BE7-F5DB5F202ECA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnalisadorLexico", "AnalisadorLexico\AnalisadorLexico.csproj", "{F2326047-BB95-4C7C-BBA4-CA1654DC5507}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompiladorMgol", "AnalisadorLexico\CompiladorMgol.csproj", "{F2326047-BB95-4C7C-BBA4-CA1654DC5507}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,28 +1,14 @@
-﻿using AnalisadorLexico;
-using AnalisadorLexico.Exceptions;
+﻿using CompiladorMgol.Common;
+using CompiladorMGol.B_Sintatico;
+using System.Runtime.CompilerServices;
 
-Lexico lx;// = new("D://Projetos/mgol2.txt");
 
-try
-{
-    lx = new("D://Projetos/mgol2.txt");
-    //lx = new("D://Projetos/main_mgol.txt");
-    ImprimeTokens(lx);
-    ImprimeTabelaSimbolos(lx);
-}catch(ArquivoFonteNaoEncontradoException ex)
-{
-    Console.WriteLine(ex.Message);
-    Console.ReadLine();
-    Environment.Exit(0);
-}
+//TestaLexico();
+TestaSintatico();
 
-void ImprimeTabelaSimbolos(Lexico lx)
+static void TestaLexico()
 {
-    lx.ImprimeTabelaDeSimbolos();
-}
-
-static void ImprimeTokens(Lexico lx)
-{
+    Lexico lx = new();
     while (!lx.EndOfFile)
     {
         var tk = lx.Scanner();
@@ -38,8 +24,13 @@ static void ImprimeTokens(Lexico lx)
         Console.Write(" TIPO: ");
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Write(tk.Tipo);
-        Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine();
-        //Console.ReadLine();
+
     }
+}
+
+static void TestaSintatico()
+{
+    Sintatico ass = new();
+    ass.IniciaAnalise();
 }

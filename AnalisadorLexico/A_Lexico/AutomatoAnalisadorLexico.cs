@@ -1,10 +1,10 @@
-﻿namespace AnalisadorLexico;
+﻿namespace CompiladorMGol.A_Lexico;
 
 internal class AutomatoAnalisadorLexico
 {
     private int[,] afd = new int[25, 24];
     private int linha_atual = 0;
-    public int EstadoAtual { get { return this.linha_atual; } }
+    public int EstadoAtual { get { return linha_atual; } }
 
     public AutomatoAnalisadorLexico()
     {
@@ -162,7 +162,7 @@ internal class AutomatoAnalisadorLexico
     {
         if (char.IsDigit(caracterAtual))
             return TrataCaracteresEspeciais(1);
-     
+
         else if (char.IsLetter(caracterAtual))
         {
             if (caracterAtual.ToString().ToLower().Equals("e"))
@@ -227,9 +227,9 @@ internal class AutomatoAnalisadorLexico
         linha_atual = afd[linha_atual, coluna_do_caractere];
         return true;
     }
-    
+
     public void ReiniciaEstado()
     {
-        this.linha_atual = 0;
+        linha_atual = 0;
     }
 }

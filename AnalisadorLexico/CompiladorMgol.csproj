@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Recursos\AlfabetoCompleto.txt" />
+    <None Remove="Recursos\AlfabetoReduzido.txt" />
+    <None Remove="Recursos\programa_mgol.txt" />
+    <None Remove="Recursos\programa_resumido.txt" />
+    <None Remove="Recursos\sintatico_resumido.csv" />
+    <None Remove="Recursos\tabela_mgol.csv" />
+    <None Remove="Recursos\tabela_mgol_2.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Recursos\AlfabetoCompleto.txt" />
+    <EmbeddedResource Include="Recursos\AlfabetoReduzido.txt" />
+    <EmbeddedResource Include="Recursos\programa_mgol.txt" />
+    <EmbeddedResource Include="Recursos\programa_resumido.txt" />
+    <EmbeddedResource Include="Recursos\sintatico_resumido.csv" />
+    <EmbeddedResource Include="Recursos\tabela_mgol.csv" />
+    <EmbeddedResource Include="Recursos\tabela_mgol_2.csv" />
+  </ItemGroup>
+
+</Project>

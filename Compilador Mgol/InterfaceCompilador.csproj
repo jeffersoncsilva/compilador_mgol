@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AnalisadorLexico\AnalisadorLexico.csproj" />
+    <ProjectReference Include="..\AnalisadorLexico\CompiladorMgol.csproj" />
   </ItemGroup>
 
 </Project>
