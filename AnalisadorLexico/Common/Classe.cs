@@ -12,5 +12,7 @@ public enum Classe
     PT_V,
     VIR,
     FC_P,
-    AB_P
+    AB_P,
+    OPA,
+    ATR
 }

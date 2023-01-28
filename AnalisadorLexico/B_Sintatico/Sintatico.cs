@@ -1,8 +1,6 @@
-﻿using CompiladorMGol.Utilidades;
+﻿using CompiladorMgol.B_Sintatico;
+using CompiladorMgol.A_Lexico;
 using CompiladorMgol.Common;
-using System.Runtime.CompilerServices;
-using CompiladorMgol.B_Sintatico;
-using System.Net;
 
 namespace CompiladorMGol.B_Sintatico;
 
@@ -14,6 +12,7 @@ struct Producao
 
 public class Sintatico
 {
+    /*
     private TabelaSintatica tb;
     private Lexico lexico;
     private GerenciadorDoAlfabeto alfabeto;
@@ -77,7 +76,7 @@ public class Sintatico
         6.1 - verifica se o simbolo retornado e um estado valido.
         6.2 - se não for estado valido, lança erro.
         7 - empilhar o desvio na pilha
-        */
+        
         RegraAlfabeto acao_reducao = alfabeto.ObtemRegraDeReducao(acao);// 1
         ImprimeAcaoReducao(acao_reducao);
 
@@ -251,5 +250,6 @@ public class Sintatico
             return acao.Contains("r") || acao.Contains("s");
         }
     }
+    */
    
 }

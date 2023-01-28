@@ -1,8 +1,11 @@
-﻿namespace CompiladorMGol.A_Lexico;
+﻿using CompiladorMgol.A_Lexico;
+using static CompiladorMgol.A_Lexico.CaracteresEspeciais;
+
+namespace CompiladorMGol.A_Lexico;
 
 internal class AutomatoAnalisadorLexico
 {
-    private int[,] afd = new int[25, 24];
+    private int[,] afd = new int[25, 25];
     private int linha_atual = 0;
     public int EstadoAtual { get { return linha_atual; } }
 
@@ -52,6 +55,7 @@ internal class AutomatoAnalisadorLexico
             afd[20, 21] = 20;
             afd[20, 22] = 20;
             afd[20, 23] = 20;
+            afd[20, 24] = 20;
 
         }
 
@@ -85,6 +89,9 @@ internal class AutomatoAnalisadorLexico
             afd[11, 19] = 11;
             afd[11, 20] = 11;
             afd[11, 21] = 11;
+            afd[11, 22] = 11;
+            afd[11, 23] = 11;
+            afd[11, 24] = 11;
         }
 
         void InicializaestadoQ7()
@@ -158,11 +165,11 @@ internal class AutomatoAnalisadorLexico
                 afd[i, j] = -1;
     }
 
-    public bool CaractereValido(char caracterAtual)
+    public bool CaractereValido(char caracterAtual, ref bool erro)
     {
+        erro = false;
         if (char.IsDigit(caracterAtual))
             return TrataCaracteresEspeciais(1);
-
         else if (char.IsLetter(caracterAtual))
         {
             if (caracterAtual.ToString().ToLower().Equals("e"))
@@ -178,43 +185,46 @@ internal class AutomatoAnalisadorLexico
 
         switch (caracterAtual)
         {
-            case '+':
+            case SOMA:
                 return TrataCaracteresEspeciais(3);
-            case '-':
+            case SUBTRACAO:
                 return TrataCaracteresEspeciais(4);
-            case '\\':
+            case DIVISAO:
                 return TrataCaracteresEspeciais(20);
-            case '*':
+            case MULTIPLICACAO:
                 return TrataCaracteresEspeciais(25);
-            case '(':
+            case ABRE_PARENTESES:
                 return TrataCaracteresEspeciais(9);
-            case ')':
+            case FECHA_PARENTESES:
                 return TrataCaracteresEspeciais(10);
-            case '=':
+            case ATRIBUICAO:
                 return TrataCaracteresEspeciais(13);
-            case '>':
+            case MAIOR:
                 return TrataCaracteresEspeciais(15);
-            case '<':
+            case MENOR:
                 return TrataCaracteresEspeciais(14);
-            case '"':
+            case ASPAS_DUPLAS:
                 return TrataCaracteresEspeciais(16);
-            case ',':
+            case VIRGULA:
                 return TrataCaracteresEspeciais(17);
-            case '.':
+            case PONTO:
                 return TrataCaracteresEspeciais(7);
-            case ';':
+            case PONTO_VIRGULA:
                 return TrataCaracteresEspeciais(18);
-            case ':':
+            case DOIS_PONTOS:
                 return TrataCaracteresEspeciais(21);
-            case '{':
+            case ABRE_CHAVES:
                 return TrataCaracteresEspeciais(11);
-            case '}':
+            case FECHA_CHAVES:
                 return TrataCaracteresEspeciais(12);
-            case '!':
+            case DIFERENTE:
                 return TrataCaracteresEspeciais(22);
-            case '?':
+            case INTERROGACAO:
                 return TrataCaracteresEspeciais(23);
+            case ESPACO:
+                return TrataCaracteresEspeciais(24);
         }
+        erro = true;
         return false;
     }
 

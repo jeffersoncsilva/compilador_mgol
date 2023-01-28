@@ -1,4 +1,5 @@
 ﻿using AnalisadorLexico.Exceptions;
+using CompiladorMgol.Common;
 using System.Text;
 
 namespace AnalisadorLexico;
@@ -17,22 +18,22 @@ public class TabelaDeSimbolos
     
     public void AtualizaSimbolo(Token token)
     {
-        try
-        {
-            var tk = BuscaSimbolo(token);
-            tokens.Remove(tk);
-            tokens.Add(token);
-        }catch(TokenNaoEncontradoException ex)
-        {
-            throw ex;
-        }
+    //    try
+    //    {
+    //        var tk = BuscaSimbolo(token);
+    //        tokens.Remove(tk);
+    //        tokens.Add(token);
+    //    }catch(TokenNaoEncontradoException ex)
+    //    {
+    //        throw ex;
+    //    }
     }
 
-    public Token BuscaSimbolo(Token tk)
+    public Token? BuscaSimbolo(Token tk)
     {
         var token = tokens.Where(t => t.Lexema == tk.Lexema).FirstOrDefault();
         if (token.Lexema == null)
-            throw new TokenNaoEncontradoException("O token buscado não está na tabela de simbolos.");
+            return null;
         return token;
     }
 

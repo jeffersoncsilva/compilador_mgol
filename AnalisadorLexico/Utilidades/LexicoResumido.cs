@@ -26,9 +26,9 @@ internal class LexicoResumido
                 var conteudo = line.Split(' ');
                 foreach (var l in conteudo)
                 {
-                    tokens.Add(new Token(l));
+                  //  tokens.Add(new Token(l));
                 }
-                tokens.Add(new Token("$"));
+                //tokens.Add(new Token("$"));
             }
         }
     }
@@ -41,10 +41,10 @@ internal class LexicoResumido
         return new StreamReader(resourceStream);
     }
 
-    public Token ProximoToken()
-    {
-        return (tokens.Count > ultimo) ? tokens[ultimo++] : new Token("$");
-    }
+    //public Token ProximoToken()
+    //{
+    //    return (tokens.Count > ultimo) ? tokens[ultimo++] : new Token("$");
+    //}
 
     public bool Acabou() => ultimo == tokens.Count;
 
