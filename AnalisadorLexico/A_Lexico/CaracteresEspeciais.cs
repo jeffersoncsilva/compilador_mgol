@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CompiladorMgol.A_Lexico;
+﻿namespace CompiladorMgol.A_Lexico;
 
 internal struct CaracteresEspeciais
 {
     public const char SOMA = '+',
     SUBTRACAO = '-',
-    DIVISAO = '\\',
+    DIVISAO = '/',
     MULTIPLICACAO = '*',
     ABRE_PARENTESES = '(',
     FECHA_PARENTESES = ')',
@@ -26,6 +20,10 @@ internal struct CaracteresEspeciais
     FECHA_CHAVES = '}',
     DIFERENTE = '!',
     INTERROGACAO = '?',
+    TABULACAO = '\t',
+    QUEBRA_DE_LINHA = '\n',
+    CARRIEGE_RETURN = '\r',
+    BARRA_INVERTIDA = '\\',
     ESPACO = ' ';
 
     public static bool EhCaractereEspecial(char caracter)

@@ -5,7 +5,7 @@ namespace CompiladorMGol.A_Lexico;
 
 internal class AutomatoAnalisadorLexico
 {
-    private int[,] afd = new int[25, 25];
+    private int[,] afd = new int[25, 29];
     private int linha_atual = 0;
     public int EstadoAtual { get { return linha_atual; } }
 
@@ -56,6 +56,10 @@ internal class AutomatoAnalisadorLexico
             afd[20, 22] = 20;
             afd[20, 23] = 20;
             afd[20, 24] = 20;
+            afd[20, 25] = 20;
+            afd[20, 26] = 20;
+            afd[20, 27] = 20;
+            afd[20, 28] = 20;
 
         }
 
@@ -92,6 +96,10 @@ internal class AutomatoAnalisadorLexico
             afd[11, 22] = 11;
             afd[11, 23] = 11;
             afd[11, 24] = 11;
+            afd[11, 25] = 11;
+            afd[11, 26] = 11;
+            afd[11, 27] = 11;
+            afd[11, 28] = 11;
         }
 
         void InicializaestadoQ7()
@@ -155,6 +163,10 @@ internal class AutomatoAnalisadorLexico
             afd[0, 18] = 23;
             afd[0, 19] = 24;
             afd[0, 20] = 24;
+            afd[0, 24] = 0;
+            afd[0, 25] = 0;
+            afd[0, 26] = 0;
+            afd[0, 27] = 0;
         }
     }
 
@@ -223,6 +235,14 @@ internal class AutomatoAnalisadorLexico
                 return TrataCaracteresEspeciais(23);
             case ESPACO:
                 return TrataCaracteresEspeciais(24);
+            case TABULACAO:
+                return TrataCaracteresEspeciais(25);
+            case QUEBRA_DE_LINHA:
+                return TrataCaracteresEspeciais(26);
+            case CARRIEGE_RETURN:
+                return TrataCaracteresEspeciais(27);
+            case BARRA_INVERTIDA:
+                return TrataCaracteresEspeciais(28);
         }
         erro = true;
         return false;

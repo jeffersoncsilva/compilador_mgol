@@ -18,12 +18,6 @@ namespace CompiladorMgol.A_Lexico
 
         public bool EndOfFile { get; private set; }
 
-        //private string[] linha;
-        //private int numero_linha = 0;
-        //private string palavra_atual;
-        //private int idxPalavraParaLer = 0;
-        //private int idxCaractererPalavraAtual = 0;
-
         private int linha_sendo_lida;
         private int coluna_sendo_lida;
         private char caractereAtual;
@@ -32,9 +26,7 @@ namespace CompiladorMgol.A_Lexico
         public Lexico()
         {
             InicializaLeituraArquivo();
-            //linha_que_esta_sendo_lida = reader.ReadLine();
             linha_sendo_lida = 1;
-            //coluna_sendo_lida = 0;
             afd = new();
             tabelaDeSimbolos = new();
         }
@@ -56,48 +48,26 @@ namespace CompiladorMgol.A_Lexico
                     caractereAtual = LeProximoCaractere();
                 
                 bool erro = false;
-                
-                if (EspacoEmBrancoOuTabulacao(caractereAtual) && afd.EstadoAtual != 20 && afd.EstadoAtual != 11)
-                {
-                    jaConsumiuCaractereAtual = true;
-                    if (caracteresLidos.Length > 0)
-                        return RetornaTokenCriado(caracteresLidos.ToString());
-                    continue;
-                }
-                
-                if (ECarriegeReturn(caractereAtual))
-                {
-                    jaConsumiuCaractereAtual = true;
-                    continue;
-                }
-                
-                if (EQuebraDeLinha(caractereAtual))
-                {
-                    jaConsumiuCaractereAtual = true;
-                    linha_sendo_lida++;
-                    coluna_sendo_lida = 0;
-                    if (caracteresLidos.Length > 0)
-                        return RetornaTokenCriado(caracteresLidos.ToString());
-                    continue;
-                }
-                
                 if (afd.CaractereValido(caractereAtual, ref erro))
                 {
-                    caracteresLidos.Append(caractereAtual);
                     jaConsumiuCaractereAtual = true;
+                    if ('\t' == caractereAtual || '\n' == caractereAtual || '\r' == caractereAtual)
+                        continue;
+                    caracteresLidos.Append(caractereAtual);
                     continue;
                 }
-                else if (erro)
+                if (erro || '\\'==caractereAtual)
                 {
                     if (!CaracteresEspeciais.EhCaractereEspecial(caractereAtual))
                     {
                         ImprimeMensagemErroLexico(caractereAtual);
                     }
-                }
-                if (caracteresLidos.Length == 0 && CaracteresEspeciais.EhCaractereEspecial(caractereAtual))
-                {
-                    jaConsumiuCaractereAtual = true;
-                    return RetornaTokenCriado($"{caractereAtual}");
+                    if(caracteresLidos.Length != 0)
+                    {
+                        jaConsumiuCaractereAtual = true;
+                        return RetornaTokenCriado(caracteresLidos.ToString());
+                    }
+                    
                 }
                 if (caracteresLidos.Length > 0)
                 {
@@ -106,12 +76,6 @@ namespace CompiladorMgol.A_Lexico
                 }
             }
         }
-        
-        private bool ECarriegeReturn(char c) => '\r'.Equals(c);
-       
-        private bool EQuebraDeLinha(char caracter) => '\n'.Equals(caracter);
-
-        private bool EspacoEmBrancoOuTabulacao(char caracter) => ' '.Equals(caracter) || '\t'.Equals(caracter);
 
         private void ImprimeMensagemErroLexico(char caracter)
         {
@@ -132,6 +96,12 @@ namespace CompiladorMgol.A_Lexico
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.WriteLine("Comentario identificado e ignorado. Comentario: " + caracter);
                     break;
+                case 11:
+                    Console.WriteLine($"Caracter faltante encontrado: caracterer: '}}' - Linha: {linha_sendo_lida} - Coluna: {coluna_sendo_lida}");
+                    break;
+                case 20:
+                    Console.WriteLine($"Caracter faltante encontrado: caracterer: '\"' - Linha: {linha_sendo_lida} - Coluna: {coluna_sendo_lida}");
+                    break;
                 default:
                     Console.WriteLine($"Caracter não esperado encontrado: {caracter} - Linha: {linha_sendo_lida} - Coluna: {coluna_sendo_lida}");
                     break;
@@ -143,20 +113,14 @@ namespace CompiladorMgol.A_Lexico
         {
             var caracter = (char)reader.Read();
             coluna_sendo_lida++;
+            if('\r' == caracter)
+            {
+                coluna_sendo_lida = 0;
+                linha_sendo_lida++;
+            }
             return caracter;
         }
 
-        private void FinalizaLeituraDoArquivoFonte()
-        {
-            //reader.Dispose();
-            Console.WriteLine("Fim de leitura de aquivo fonte...");
-        }
-
-        private bool PalavraAtualEVaziaOuEspacoEmBranco(string palavra)
-        {
-            return palavra.Length == 0;
-        }
-        
         private Token RetornaTokenCriado(string lexema)
         {
             try
