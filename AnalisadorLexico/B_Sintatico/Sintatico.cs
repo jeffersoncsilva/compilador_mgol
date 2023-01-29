@@ -1,6 +1,7 @@
 ﻿using CompiladorMgol.B_Sintatico;
 using CompiladorMgol.A_Lexico;
 using CompiladorMgol.Common;
+using AnalisadorLexico;
 
 namespace CompiladorMGol.B_Sintatico;
 
@@ -12,7 +13,7 @@ struct Producao
 
 public class Sintatico
 {
-    /*
+    
     private TabelaSintatica tb;
     private Lexico lexico;
     private GerenciadorDoAlfabeto alfabeto;
@@ -36,8 +37,8 @@ public class Sintatico
         while (entradaNaoFoiAceita && erroNaoFoiEncontrado)
         {
             int estadoAtual_linha = pilha.Peek();
-            var tokenEntrada_coluna = tokenAtual.Classe;
-            var acao = tb.PegaAcao(estadoAtual_linha, tokenEntrada_coluna);
+            //var tokenEntrada_coluna = tokenAtual.Classe;
+            var acao = tb.PegaAcao(estadoAtual_linha, ((int)tokenAtual.Classe));
             if (EParaEmpilhar(acao))
             {
                 RealizaAcaoDeShift(acao);
@@ -76,14 +77,14 @@ public class Sintatico
         6.1 - verifica se o simbolo retornado e um estado valido.
         6.2 - se não for estado valido, lança erro.
         7 - empilhar o desvio na pilha
-        
+        */
         RegraAlfabeto acao_reducao = alfabeto.ObtemRegraDeReducao(acao);// 1
         ImprimeAcaoReducao(acao_reducao);
 
         DesempilhaSimbolos(); //3
 
         var t = pilha.Peek(); // 4
-        var nova_acao = tb.PegaAcao(t, acao_reducao.LadoEsquerdo.Trim());// 6
+        var nova_acao = tb.PegaAcao(t, acao_reducao.RecuperaPosicaoReducao());// 6
         if (int.TryParse(nova_acao, out int novo_estado))
             pilha.Push(novo_estado);
         else
@@ -170,28 +171,28 @@ public class Sintatico
      
     private void TrataErroEstado0()
     {
-        if ("varinicio".Equals(tokenAtual.Classe))
+        if (Classe.varinicio == tokenAtual.Classe)
         {
             pilha.Push(2);
-            Console.WriteLine("Erro: token esperado: inicio - token encontrado: " + tokenAtual.Classe);
+            Console.WriteLine($"Erro: token esperado: inicio - token encontrado: {tokenAtual.Classe} - Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
         }
         else
         {
             // avança ate encontrar o token varfim 
-            while (!"varfim".Equals(tokenAtual.Classe) &&  !"fim".Equals(tokenAtual.Classe) && !"$".Equals(tokenAtual.Classe))
+            while (Classe.varfim != tokenAtual.Classe && Classe.fim != tokenAtual.Classe && Classe.cifrao != tokenAtual.Classe)
                 tokenAtual = lexico.Scanner();
-            if(tokenAtual.Classe == "varfim")
+            if (tokenAtual.Classe == Classe.varfim)
             {
                 // 0 - 2 - 4 - 17
                 pilha.Push(2);
                 pilha.Push(4);
             }
-            else if(tokenAtual.Classe == "fim")
+            else if (tokenAtual.Classe == Classe.fim)
             {
                 pilha.Push(2);
                 pilha.Push(3);
             }
-            Console.WriteLine("Erro: token não esperado encontrado: " + tokenAtual.Classe);
+            Console.WriteLine($"Erro: token não esperado encontrado: {tokenAtual.Classe} - Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
             //Console.WriteLine("O processo será interrompido.");
             //erroNaoFoiEncontrado = false;
         }
@@ -199,32 +200,32 @@ public class Sintatico
 
     private void TrataErroEstado1()
     {
-        Console.WriteLine("Token não esperado encontrado. " + tokenAtual.ToString());
+        Console.WriteLine($"Token não esperado encontrado. {tokenAtual.ToString()} - Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
         erroNaoFoiEncontrado = false;
     }
 
     private void TrataErroEstado2()
     {
-        if("varfim".Equals(tokenAtual.Classe) ||
-            "inteiro".Equals(tokenAtual.Classe) ||
-            "real".Equals(tokenAtual.Classe) ||
-            "literal".Equals(tokenAtual.Classe))
+        if(Classe.varfim == tokenAtual.Classe ||
+            Classe.inteiro == tokenAtual.Classe ||
+            Classe.real == tokenAtual.Classe ||
+            Classe.literal == tokenAtual.Classe)
         {
             pilha.Push(4);
-            Console.WriteLine("Token - varinicio - não encontrado.");
+            Console.WriteLine($"Token - varinicio - não encontrado. Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
         }
     }
     
     private void TrataErroEstado12()
     {
-        if ("opr".Equals(tokenAtual.Classe.Trim()))
+        if (Classe.opr == tokenAtual.Classe)
         {
-            Console.WriteLine("Identificador não reconhecido.");
+            Console.WriteLine($"Identificador não reconhecido. Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
             pilha.Push(30);
         }
-        else if ("num".Equals(tokenAtual.Classe.Trim()) || "id".Equals(tokenAtual.Classe.Trim()))
+        else if (Classe.num == tokenAtual.Classe || Classe.id == tokenAtual.Classe)
         {
-            Console.WriteLine("Identificador de atribuição faltando.");
+            Console.WriteLine($"Identificador de atribuição faltando. Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
             pilha.Push(30);
         }
         else
@@ -234,14 +235,14 @@ public class Sintatico
     }
     private void ExecutaModoPanico()
     {
-        Console.WriteLine("Token não esperado encontrado.");
+        Console.WriteLine($"Token não esperado encontrado. Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
         bool estadoValido = false;
         while (!estadoValido)
         {
             var estadoAtual = pilha.Peek();
             tokenAtual = lexico.Scanner();
-            var tokenEntrada_coluna = tokenAtual.Classe;
-            var acao = tb.PegaAcao(estadoAtual, tokenEntrada_coluna);
+            //var tokenEntrada_coluna = tokenAtual.Classe;
+            var acao = tb.PegaAcao(estadoAtual, ((int)tokenAtual.Classe));
             estadoValido = AcaoEValida(acao);
         }
 
@@ -250,6 +251,6 @@ public class Sintatico
             return acao.Contains("r") || acao.Contains("s");
         }
     }
-    */
+    
    
 }

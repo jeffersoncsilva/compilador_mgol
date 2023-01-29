@@ -18,15 +18,15 @@ namespace CompiladorMgol.A_Lexico
 
         public bool EndOfFile { get; private set; }
 
-        private int linha_sendo_lida;
-        private int coluna_sendo_lida;
+        public int Linha_sendo_lida { get; private set; }
+        public int Coluna_sendo_lida { get; private set; }
         private char caractereAtual;
         private bool jaConsumiuCaractereAtual = true;
 
         public Lexico()
         {
             InicializaLeituraArquivo();
-            linha_sendo_lida = 1;
+            Linha_sendo_lida = 1;
             afd = new();
             tabelaDeSimbolos = new();
         }
@@ -80,7 +80,7 @@ namespace CompiladorMgol.A_Lexico
         private void ImprimeMensagemErroLexico(char caracter)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Caracter não esperado encontrado: " + caracter + " - Linha: " + linha_sendo_lida + " - Coluna: " + coluna_sendo_lida);
+            Console.WriteLine("Caracter não esperado encontrado: " + caracter + " - Linha: " + Linha_sendo_lida + " - Coluna: " + Coluna_sendo_lida);
             Console.ForegroundColor = ConsoleColor.White;
         }
 
@@ -90,20 +90,20 @@ namespace CompiladorMgol.A_Lexico
             switch (afd.EstadoAtual)
             {
                 case 2:
-                    Console.WriteLine($"Caracterer mal formatado encontrado. Caractere: {caracter} - Linha: {linha_sendo_lida} - Coluna: {coluna_sendo_lida}");
+                    Console.WriteLine($"Caracterer mal formatado encontrado. Caractere: {caracter} - Linha: {Linha_sendo_lida} - Coluna: {Coluna_sendo_lida}");
                     break;
                 case 12:
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.WriteLine("Comentario identificado e ignorado. Comentario: " + caracter);
                     break;
                 case 11:
-                    Console.WriteLine($"Caracter faltante encontrado: caracterer: '}}' - Linha: {linha_sendo_lida} - Coluna: {coluna_sendo_lida}");
+                    Console.WriteLine($"Caracter faltante encontrado: caracterer: '}}' - Linha: {Linha_sendo_lida} - Coluna: {Coluna_sendo_lida}");
                     break;
                 case 20:
-                    Console.WriteLine($"Caracter faltante encontrado: caracterer: '\"' - Linha: {linha_sendo_lida} - Coluna: {coluna_sendo_lida}");
+                    Console.WriteLine($"Caracter faltante encontrado: caracterer: '\"' - Linha: {Linha_sendo_lida} - Coluna: {Coluna_sendo_lida}");
                     break;
                 default:
-                    Console.WriteLine($"Caracter não esperado encontrado: {caracter} - Linha: {linha_sendo_lida} - Coluna: {coluna_sendo_lida}");
+                    Console.WriteLine($"Caracter não esperado encontrado: {caracter} - Linha: {Linha_sendo_lida} - Coluna: {Coluna_sendo_lida}");
                     break;
             }
             Console.ForegroundColor = ConsoleColor.White;
@@ -112,11 +112,11 @@ namespace CompiladorMgol.A_Lexico
         private char LeProximoCaractere()
         {
             var caracter = (char)reader.Read();
-            coluna_sendo_lida++;
+            Coluna_sendo_lida++;
             if('\r' == caracter)
             {
-                coluna_sendo_lida = 0;
-                linha_sendo_lida++;
+                Coluna_sendo_lida = 0;
+                Linha_sendo_lida++;
             }
             return caracter;
         }
@@ -155,34 +155,34 @@ namespace CompiladorMgol.A_Lexico
                 case 1:
                 case 3:
                 case 6:
-                    return new Token(Classe.NUM, lexema, Tipo.INTEIRO);
+                    return new Token(Classe.num, lexema, Tipo.INTEIRO);
                 case 7:
-                    return new Token(Classe.ID, lexema, Tipo.NULO);
+                    return new Token(Classe.id, lexema, Tipo.NULO);
                 case 8:
-                    return new Token(Classe.AB_P, lexema, Tipo.NULO);
+                    return new Token(Classe.ab_p, lexema, Tipo.NULO);
                 case 9:
-                    return new Token(Classe.FC_P, lexema, Tipo.NULO);
+                    return new Token(Classe.fc_p, lexema, Tipo.NULO);
                 case 13:
                 case 14:
                 case 15:
                 case 16:
                 case 17:
                 case 18:
-                    return new Token(Classe.OPR, lexema, Tipo.NULO);
+                    return new Token(Classe.opr, lexema, Tipo.NULO);
                 case 19:
-                    return new Token(Classe.ATR, lexema, Tipo.NULO);
+                    return new Token(Classe.atr, lexema, Tipo.NULO);
                 case 21:
-                    return new Token(Classe.LIT, lexema, Tipo.NULO);
+                    return new Token(Classe.lit, lexema, Tipo.NULO);
                 case 22:
-                    return new Token(Classe.VIR, lexema, Tipo.NULO);
+                    return new Token(Classe.vir, lexema, Tipo.NULO);
                 case 23:
-                    return new Token(Classe.PT_V, lexema, Tipo.NULO);
+                    return new Token(Classe.pt_v, lexema, Tipo.NULO);
                 case 24:
-                    return new Token(Classe.OPA, lexema, Tipo.NULO);
+                    return new Token(Classe.opa, lexema, Tipo.NULO);
             }
             if (lexema.Equals(EOF))
             {
-                return new Token(Classe.PL_RESERVADA, "$", Tipo.NULO);   
+                return new Token(Classe.cifrao, "$", Tipo.NULO);   
             }
             throw new TokenNaoReconhecidoException();
         }

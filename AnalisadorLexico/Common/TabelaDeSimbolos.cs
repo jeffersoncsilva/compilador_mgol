@@ -39,18 +39,18 @@ public class TabelaDeSimbolos
 
     private void AdicionaPalavrasReservadasNaTabela()
     {
-        tokens.Add(new Token(Classe.PL_RESERVADA, "inicio", Tipo.PALAVRA_RES));
-        tokens.Add(new Token(Classe.PL_RESERVADA, "varinicio", Tipo.PALAVRA_RES));
-        tokens.Add(new Token(Classe.PL_RESERVADA, "varfim", Tipo.PALAVRA_RES));
-        tokens.Add(new Token(Classe.PL_RESERVADA, "escreva", Tipo.PALAVRA_RES));
-        tokens.Add(new Token(Classe.PL_RESERVADA, "leia", Tipo.PALAVRA_RES));
-        tokens.Add(new Token(Classe.PL_RESERVADA, "se", Tipo.PALAVRA_RES));
-        tokens.Add(new Token(Classe.PL_RESERVADA, "entao", Tipo.PALAVRA_RES));
-        tokens.Add(new Token(Classe.PL_RESERVADA, "fimse", Tipo.PALAVRA_RES));
-        tokens.Add(new Token(Classe.PL_RESERVADA, "fim", Tipo.PALAVRA_RES));
-        tokens.Add(new Token(Classe.PL_RESERVADA, "inteiro", Tipo.PALAVRA_RES));
-        tokens.Add(new Token(Classe.PL_RESERVADA, "literal", Tipo.PALAVRA_RES));
-        tokens.Add(new Token(Classe.PL_RESERVADA, "real", Tipo.PALAVRA_RES));
+        tokens.Add(new Token(Classe.inicio, "inicio", Tipo.PALAVRA_RES));
+        tokens.Add(new Token(Classe.varinicio, "varinicio", Tipo.PALAVRA_RES));
+        tokens.Add(new Token(Classe.varfim, "varfim", Tipo.PALAVRA_RES));
+        tokens.Add(new Token(Classe.escreva, "escreva", Tipo.PALAVRA_RES));
+        tokens.Add(new Token(Classe.leia, "leia", Tipo.PALAVRA_RES));
+        tokens.Add(new Token(Classe.se, "se", Tipo.PALAVRA_RES));
+        tokens.Add(new Token(Classe.entao, "entao", Tipo.PALAVRA_RES));
+        tokens.Add(new Token(Classe.fimse, "fimse", Tipo.PALAVRA_RES));
+        tokens.Add(new Token(Classe.fim, "fim", Tipo.PALAVRA_RES));
+        tokens.Add(new Token(Classe.inteiro, "inteiro", Tipo.PALAVRA_RES));
+        tokens.Add(new Token(Classe.literal, "literal", Tipo.PALAVRA_RES));
+        tokens.Add(new Token(Classe.real, "real", Tipo.PALAVRA_RES));
     }
 
     public override string ToString()

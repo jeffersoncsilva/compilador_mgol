@@ -3,8 +3,8 @@ using CompiladorMGol.B_Sintatico;
 using System.Runtime.CompilerServices;
 
 
-TestaLexico();
-//TestaSintatico();
+//TestaLexico();
+TestaSintatico();
 
 static void TestaLexico()
 {
@@ -28,8 +28,8 @@ static void TestaLexico()
     }
 }
 
-//static void TestaSintatico()
-//{
-//    Sintatico ass = new();
-//    ass.IniciaAnalise();
-//}
+static void TestaSintatico()
+{
+    Sintatico ass = new();
+    ass.IniciaAnalise();
+}

@@ -95,22 +95,10 @@ public class TabelaSintatica
         return sb.ToString();
     }
 
-    public string PegaAcao(int linha, string coluna)
+    public string PegaAcao(int linha, int coluna)
     {
-        //if (!int.TryParse(linha, out int line))
-        //    return "";
-
-        int col = primeira_linha_tabela[coluna];
-        return table[linha, col];
-        //if ("0".Equals(posicao.Trim()))
-        //    return Acao.Erro;
-        //if (EParaReduzir(posicao))
-        //    return Acao.Reduzir;
-        //if (EParaEmpilhar(posicao))
-        //    return Acao.Empilhar;
-
-        //return Acao.Erro;
-
+        //int col = primeira_linha_tabela[coluna];
+        return table[linha, coluna];
     }
 
     private void TratarPrimeiraLinha(string? firstLine)
