@@ -15,6 +15,7 @@ namespace CompiladorMgol.A_Lexico
         private StreamReader reader;
         private AutomatoAnalisadorLexico afd;
         private TabelaDeSimbolos tabelaDeSimbolos;
+        public TabelaDeSimbolos TabelaDeSimbolos { get { return this.tabelaDeSimbolos; } }
 
         public bool EndOfFile { get; private set; }
 
@@ -22,6 +23,7 @@ namespace CompiladorMgol.A_Lexico
         public int Coluna_sendo_lida { get; private set; }
         private char caractereAtual;
         private bool jaConsumiuCaractereAtual = true;
+        private Logging logLexico;
 
         public Lexico()
         {
@@ -29,6 +31,7 @@ namespace CompiladorMgol.A_Lexico
             Linha_sendo_lida = 1;
             afd = new();
             tabelaDeSimbolos = new();
+            logLexico = new();
         }
 
         public Token Scanner()
@@ -65,14 +68,14 @@ namespace CompiladorMgol.A_Lexico
                     if(caracteresLidos.Length != 0)
                     {
                         jaConsumiuCaractereAtual = true;
-                        return RetornaTokenCriado(caracteresLidos.ToString());
+                        return RetornaTokenCriado(caracteresLidos.ToString().Trim());
                     }
                     
                 }
                 if (caracteresLidos.Length > 0)
                 {
                     jaConsumiuCaractereAtual = false;
-                    return RetornaTokenCriado(caracteresLidos.ToString());
+                    return RetornaTokenCriado(caracteresLidos.ToString().Trim());
                 }
             }
         }
@@ -82,31 +85,32 @@ namespace CompiladorMgol.A_Lexico
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Caracter não esperado encontrado: " + caracter + " - Linha: " + Linha_sendo_lida + " - Coluna: " + Coluna_sendo_lida);
             Console.ForegroundColor = ConsoleColor.White;
+            //logLexico.LogErrors("Caracter não esperado encontrado: " + caracter + " - Linha: " + Linha_sendo_lida + " - Coluna: " + Coluna_sendo_lida);
         }
 
         private void ImprimeMensagemErroLexico(string caracter)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
+            //Console.ForegroundColor = ConsoleColor.Red;
             switch (afd.EstadoAtual)
             {
                 case 2:
-                    Console.WriteLine($"Caracterer mal formatado encontrado. Caractere: {caracter} - Linha: {Linha_sendo_lida} - Coluna: {Coluna_sendo_lida}");
+                    logLexico.Log($"Caracterer mal formatado encontrado. Caractere: {caracter} - Linha: {Linha_sendo_lida} - Coluna: {Coluna_sendo_lida}");
                     break;
                 case 12:
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.WriteLine("Comentario identificado e ignorado. Comentario: " + caracter);
+                    //Console.ForegroundColor = ConsoleColor.Blue;
+                    logLexico.Log("Comentario identificado e ignorado. Comentario: " + caracter);
                     break;
                 case 11:
-                    Console.WriteLine($"Caracter faltante encontrado: caracterer: '}}' - Linha: {Linha_sendo_lida} - Coluna: {Coluna_sendo_lida}");
+                    logLexico.Log($"Caracter faltante encontrado: caracterer: '}}' - Linha: {Linha_sendo_lida} - Coluna: {Coluna_sendo_lida}");
                     break;
                 case 20:
-                    Console.WriteLine($"Caracter faltante encontrado: caracterer: '\"' - Linha: {Linha_sendo_lida} - Coluna: {Coluna_sendo_lida}");
+                    logLexico.Log($"Caracter faltante encontrado: caracterer: '\"' - Linha: {Linha_sendo_lida} - Coluna: {Coluna_sendo_lida}");
                     break;
                 default:
-                    Console.WriteLine($"Caracter não esperado encontrado: {caracter} - Linha: {Linha_sendo_lida} - Coluna: {Coluna_sendo_lida}");
+                    logLexico.Log($"Caracter não esperado encontrado: {caracter} - Linha: {Linha_sendo_lida} - Coluna: {Coluna_sendo_lida}");
                     break;
             }
-            Console.ForegroundColor = ConsoleColor.White;
+            //Console.ForegroundColor = ConsoleColor.White;
         }
 
         private char LeProximoCaractere()
@@ -137,15 +141,10 @@ namespace CompiladorMgol.A_Lexico
             }
             catch (TokenNaoReconhecidoException ex)
             {
-                //Console.WriteLine($"Erro: {ex.Message} - linha {linha_sendo_lida} coluna {coluna_sendo_lida}");
                 ImprimeMensagemErroLexico(lexema);
                 afd.ReiniciaEstado();
                 return Scanner();
             }
-            //finally
-            //{
-            //    afd.ReiniciaEstado();
-            //}
         }
         
         private Token CriarToken(string lexema)
@@ -170,7 +169,7 @@ namespace CompiladorMgol.A_Lexico
                 case 18:
                     return new Token(Classe.opr, lexema, Tipo.NULO);
                 case 19:
-                    return new Token(Classe.atr, lexema, Tipo.NULO);
+                    return new Token(Classe.atr, "=", Tipo.NULO);
                 case 21:
                     return new Token(Classe.lit, lexema, Tipo.NULO);
                 case 22:

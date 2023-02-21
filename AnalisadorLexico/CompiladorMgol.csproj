@@ -9,6 +9,7 @@
   <ItemGroup>
     <None Remove="Recursos\AlfabetoCompleto.txt" />
     <None Remove="Recursos\AlfabetoReduzido.txt" />
+    <None Remove="Recursos\codigo.txt" />
     <None Remove="Recursos\programa_mgol.txt" />
     <None Remove="Recursos\programa_resumido.txt" />
     <None Remove="Recursos\sintatico_resumido.csv" />
@@ -19,6 +20,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Recursos\AlfabetoCompleto.txt" />
     <EmbeddedResource Include="Recursos\AlfabetoReduzido.txt" />
+    <EmbeddedResource Include="Recursos\codigo.txt" />
     <EmbeddedResource Include="Recursos\programa_mgol.txt" />
     <EmbeddedResource Include="Recursos\programa_resumido.txt" />
     <EmbeddedResource Include="Recursos\sintatico_resumido.csv" />

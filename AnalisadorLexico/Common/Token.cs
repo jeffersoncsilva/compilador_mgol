@@ -2,7 +2,7 @@
 
 namespace CompiladorMgol.Common;
 
-public struct Token
+public class Token
 {
     public Classe Classe { get; set; }
     public Tipo Tipo { get; set; }
