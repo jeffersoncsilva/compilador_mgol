@@ -1,6 +1,6 @@
 ﻿inicio
-varinicio
-	literal A;
+a
+literal A;
 inteiro B, D, E;
 real C;
 varfim;

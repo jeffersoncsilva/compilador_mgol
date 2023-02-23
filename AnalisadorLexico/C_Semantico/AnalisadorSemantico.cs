@@ -305,7 +305,14 @@ public class AnalisadorSemantico
             var escreva = pilhaSemantica.Pop();
             var es = new Token(Classe.ES, "ES", arg.Tipo);
             pilhaSemantica.Push(es);
-            geradorCodigoFinal.ImprimeArquivoFinal($"printf({arg.Lexema});\n");
+            if(arg.Tipo == Tipo.LITERAL)
+                geradorCodigoFinal.ImprimeArquivoFinal($"printf(\"%s\", {arg.Lexema});\n");
+            else if(arg.Tipo == Tipo.INTEIRO)
+                geradorCodigoFinal.ImprimeArquivoFinal($"printf(\"%d\", {arg.Lexema});\n");
+            else if(arg.Tipo == Tipo.REAL)
+                geradorCodigoFinal.ImprimeArquivoFinal($"printf(\"%f\", {arg.Lexema});\n");
+            else
+                geradorCodigoFinal.ImprimeArquivoFinal($"printf({arg.Lexema});\n");
             geradorCodigoFinal.QuebraDeLinha();
         }
     }

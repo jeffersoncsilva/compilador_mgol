@@ -3,6 +3,7 @@ using CompiladorMgol.A_Lexico;
 using CompiladorMgol.Common;
 using AnalisadorLexico;
 using CompiladorMgol.C_Semantico;
+using Microsoft.VisualBasic;
 
 namespace CompiladorMGol.B_Sintatico;
 
@@ -12,7 +13,6 @@ public class Sintatico
     private Lexico lexico;
     private AnalisadorSemantico semantico;
     private GerenciadorDoAlfabeto alfabeto;
-    private Logging logSintatico;
     private Stack<int> pilha;
     private bool entradaNaoFoiAceita = true;
     private bool erroNaoFoiEncontrado = true;
@@ -27,7 +27,6 @@ public class Sintatico
         pilhaSemantica = new();
         semantico = new AnalisadorSemantico(lexico.TabelaDeSimbolos, pilhaSemantica);
         pilha = new Stack<int>();
-        logSintatico = new();
     }
 
     public void IniciaAnalise()
@@ -53,15 +52,20 @@ public class Sintatico
             }
             else
             {
+                Console.ForegroundColor = ConsoleColor.Red;
+                GeradorDeCodigoFinal.HasError = true;
                 IniciaRotinaRecuperacaoDeErro(acao, estadoAtual_linha);
+                Console.ResetColor();
             }
         }
-        semantico.FinalisaGeracaoArquivo();
+        if (erroNaoFoiEncontrado)
+            semantico.FinalisaGeracaoArquivo();
     }
 
     private void RealizaAcaoDeShift(string acao)
-    {        
-        int.TryParse(ObtemEstadoDaAcao(acao), out int proximo_estado);
+    {
+        var proximoEstado = ObtemEstadoDaAcao(acao);
+        int proximo_estado = int.Parse(proximoEstado);
         pilha.Push(proximo_estado);
         pilhaSemantica.Push(tokenAtual);
         tokenAtual = lexico.Scanner();
@@ -71,49 +75,30 @@ public class Sintatico
     {
         RegraAlfabeto acao_reducao = alfabeto.ObtemRegraDeReducao(acao);
         ImprimeAcaoReducao(acao_reducao);
-        ImprimeTipoToken();
         DesempilhaSimbolos();
-        var t = pilha.Peek(); 
+        var t = pilha.Peek();
         var nova_acao = tb.PegaAcao(t, acao_reducao.RecuperaPosicaoReducao());
-        if (int.TryParse(nova_acao, out int novo_estado))
-            pilha.Push(novo_estado);
-        else
-            throw new ArgumentException("Operação invalida detectada. Operação: " + nova_acao);
-        try
-        {
-            semantico.AplicarRegraSemantica(acao_reducao, tokenAtual, lexico.Linha_sendo_lida, lexico.Coluna_sendo_lida);
-        }catch(NotImplementedException ex)
-        {
-            Console.WriteLine("Regra semantica não implementada. REGRA: " + acao_reducao);
-        }
-        
-        
+        int novo_estado = int.Parse(nova_acao);
+        pilha.Push(novo_estado);
+        semantico.AplicarRegraSemantica(acao_reducao, tokenAtual, lexico.Linha_sendo_lida, lexico.Coluna_sendo_lida);
+
         void DesempilhaSimbolos()
         {
-            var quantidade_simbolos_desempilhar = acao_reducao.LadoDireito.Length; 
-
+            var quantidade_simbolos_desempilhar = acao_reducao.LadoDireito.Length;
             for (int i = 0; i < quantidade_simbolos_desempilhar; i++)
                 pilha.Pop();
         }
     }
 
-    private void ImprimeTipoToken()
-    {
-        //Console.WriteLine("Tipo do token: " + tokenAtual.Tipo);
-    }
-
     private void ImprimeAcaoReducao(RegraAlfabeto acao_reducao)
     {
         Console.ForegroundColor = ConsoleColor.Blue;
-        //ImprimePilha();
-        //Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine(acao_reducao.ToString());
-        //logSintatico.Log(acao_reducao.ToString());
+        Console.ResetColor();
     }
 
     private void AceitaEntrada()
     {
-        logSintatico.Log("Entrada foi aceita.");
         entradaNaoFoiAceita = false;
     }
 
@@ -131,9 +116,6 @@ public class Sintatico
             case "E0":
                 TrataErroEstado0();
                 break;
-            case "E1":
-                TrataErroEstado1();
-                break;
             case "E2":
                 TrataErroEstado2();
                 break;
@@ -146,8 +128,11 @@ public class Sintatico
             case "E25":
                 TrataErroEstado25();
                 break;
+            case "E42":
+                TrataErro42();
+                break;
             default:
-                ExecutaModoPanico();
+                PanicMode(estadoAtual);
                 break;
         }
         Console.ForegroundColor = ConsoleColor.White;
@@ -173,120 +158,186 @@ public class Sintatico
     private void ImprimePilha()
     {
         Console.Write("Pilha: ");
-        foreach(var p in pilha)
+        foreach (var p in pilha)
         {
             Console.Write($"{p} ");
         }
         Console.WriteLine();
     }
-     
-    private void TrataErroEstado0()
+
+    private void GeraMensagemErroSintatico(string? tokenEsperado, string tokenAtual)
     {
-        if (Classe.varinicio == tokenAtual.Classe)
-        {
-            pilha.Push(2);
-            logSintatico.LogErrors($"Erro: token esperado: inicio - token encontrado: {tokenAtual.Classe} - Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
-        }
+        if(tokenEsperado != null)
+        Console.WriteLine($"Erro: token não esperado encontrado. Token encontrado: {tokenAtual} - token esperado: {tokenEsperado} - Linha: {lexico.Linha_sendo_lida-1} - Coluna: {lexico.Coluna_sendo_lida}");
         else
-        {
-            // avança ate encontrar o token varfim 
-            while (Classe.varfim != tokenAtual.Classe && Classe.fim != tokenAtual.Classe && Classe.cifrao != tokenAtual.Classe)
-                tokenAtual = lexico.Scanner();
-            if (tokenAtual.Classe == Classe.varfim)
-            {
-                // 0 - 2 - 4 - 17
-                pilha.Push(2);
-                pilha.Push(4);
-            }
-            else if (tokenAtual.Classe == Classe.fim)
-            {
-                pilha.Push(2);
-                pilha.Push(3);
-            }
-            logSintatico.LogErrors($"Erro: token não esperado encontrado: {tokenAtual.Classe} - Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
-            //Console.WriteLine("O processo será interrompido.");
-            //erroNaoFoiEncontrado = false;
-        }
+            Console.WriteLine($"Erro: token não esperado encontrado. Token encontrado: {tokenAtual} - Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
     }
 
-    private void TrataErroEstado1()
+    private void TrataErroEstado0()
     {
-        logSintatico.LogErrors($"Token não esperado encontrado. {tokenAtual.ToString()} - Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
-        erroNaoFoiEncontrado = false;
+        switch (tokenAtual.Classe)
+        {
+            case Classe.varinicio:
+                pilha.Push(2);
+                pilhaSemantica.Push(new Token(Classe.varinicio, "inicio", Tipo.NULO));
+                GeraMensagemErroSintatico("varinicio", tokenAtual.Classe.ToString());
+                break;
+            case Classe.TIPO:
+                pilha.Push(2);
+                pilhaSemantica.Push(new Token(Classe.varinicio, "inicio", Tipo.NULO));
+                pilha.Push(4);
+                pilhaSemantica.Push(new Token(Classe.varfim, "varfim", Tipo.NULO));
+                GeraMensagemErroSintatico("inicio", tokenAtual.Classe.ToString());
+                break;
+            default:
+                PanicMode();
+                break;
+
+        }
     }
 
     private void TrataErroEstado2()
     {
-        if(Classe.varfim == tokenAtual.Classe ||
+        if (Classe.varfim == tokenAtual.Classe ||
             Classe.inteiro == tokenAtual.Classe ||
             Classe.real == tokenAtual.Classe ||
             Classe.literal == tokenAtual.Classe)
         {
             pilha.Push(4);
-            logSintatico.LogErrors($"Token - varinicio - não encontrado. Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
+            GeraMensagemErroSintatico("varinicio", tokenAtual.Classe.ToString());
         }
+        else
+            PanicMode();
     }
-    
+
     private void TrataErroEstado10()
     {
-        if(Classe.id != tokenAtual.Classe)
+        if (Classe.id != tokenAtual.Classe)
         {
-            logSintatico.LogErrors($"Identificador esperado não encontrado. Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
-            logSintatico.LogErrors("Identificador encontrado: " + tokenAtual.Classe);
+            GeraMensagemErroSintatico("id", tokenAtual.Classe.ToString());
             pilha.Push(25);
         }
+        else
+            PanicMode();
     }
 
     private void TrataErroEstado12()
     {
-        if (Classe.opr == tokenAtual.Classe)
+        if (Classe.opr == tokenAtual.Classe || Classe.num == tokenAtual.Classe || Classe.id == tokenAtual.Classe)
         {
-            logSintatico.LogErrors($"Identificador não reconhecido. Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
-            pilha.Push(30);
-        }
-        else if (Classe.num == tokenAtual.Classe || Classe.id == tokenAtual.Classe)
-        {
-            logSintatico.LogErrors($"Identificador de atribuição faltando. Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
+            GeraMensagemErroSintatico("=", tokenAtual.Classe.ToString());
             pilha.Push(30);
         }
         else
         {
-            ExecutaModoPanico();
+            PanicMode();
         }
     }
-    
+
     private void TrataErroEstado25()
     {
-        if(Classe.pt_v != tokenAtual.Classe)
+        if (Classe.pt_v != tokenAtual.Classe)
         {
-            logSintatico.LogErrors($"Identificador ponto e vigula fantando. Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
-            logSintatico.LogErrors("Identificador encontrado: " + tokenAtual.Classe);
+            GeraMensagemErroSintatico(";", tokenAtual.Classe.ToString());
             pilha.Push(40);
+            
+            
         }
+        else
+            PanicMode();
     }
 
-    private void ExecutaModoPanico()
+    private void TrataErro42()
     {
-        logSintatico.LogErrors($"Token não esperado encontrado. Linha: {lexico.Linha_sendo_lida} - Coluna: {lexico.Coluna_sendo_lida}");
-        bool estadoValido = false;
-        string acao = "";
-        while (!estadoValido)
+        if (Classe.pt_v != tokenAtual.Classe)
         {
-            var estadoAtual = pilha.Peek();
-            tokenAtual = lexico.Scanner();
-            //var tokenEntrada_coluna = tokenAtual.Classe;
-            acao = tb.PegaAcao(estadoAtual, ((int)tokenAtual.Classe));
-            estadoValido = AcaoEValida(acao);
+            GeraMensagemErroSintatico(";", tokenAtual.Classe.ToString());
+            pilha.Push(42);
+            pilhaSemantica.Push(new Token(Classe.pt_v, "pt_v", Tipo.PALAVRA_RES));
         }
+        else
+            PanicMode();
+    }
 
-        if (estadoValido)
+    private void PanicMode(int estadoAtual = -1)
+    {
+        if (estadoAtual == -1)
+            estadoAtual = pilha.Peek();
+        var msg = ObtemMensagemDeErro(estadoAtual);
+        GeraMensagemErroSintatico(msg, tokenAtual.Classe.ToString());
+
+        var tokensSincorinizacao = ObtemTokensSincronizacao(estadoAtual);
+
+        while (!tokensSincorinizacao.Contains(tokenAtual.Classe))
+        {
+            tokenAtual = lexico.Scanner();
+            pilhaSemantica.Push(tokenAtual);
+        }
+        
+        var acao = tb.PegaAcao(estadoAtual, ((int)tokenAtual.Classe));
+        if(AcaoEValida(acao))
             RealizaAcaoDeShift(acao);
+
+
+        //bool estadoValido = false;
+        //string acao = "";
+        //while (!estadoValido)
+        //{
+        //    estadoAtual = pilha.Peek();
+        //    tokenAtual = lexico.Scanner();
+        //    if (tokenAtual.Classe != Classe.pt_v)
+        //        continue;
+        //    acao = tb.PegaAcao(estadoAtual, ((int)tokenAtual.Classe));
+        //    estadoValido = AcaoEValida(acao);
+        //}
+
+        //if (estadoValido)
+        //    RealizaAcaoDeShift(acao);
 
         bool AcaoEValida(string acao)
         {
             return acao.Contains("r") || acao.Contains("s");
         }
     }
-    
-   
+
+    private string ObtemMensagemDeErro(int estadoAtual)
+    {
+        string msg = "";
+        switch (estadoAtual)
+        {
+            case 2:
+                msg = "varinicio";
+                break;
+            case 42:
+                msg = ";";
+                break;
+            case 58:
+                msg = "identificador ou constante";
+                break;
+        }
+        return msg;
+    }
+
+    private List<Classe> ObtemTokensSincronizacao(int estadoAtual)
+    {
+        List<Classe> tokens = new();
+
+        switch (estadoAtual)
+        {
+            case 2:
+                tokens.Add(Classe.varfim);                
+                break;
+            case 42:
+                tokens.Add(Classe.pt_v);
+                break;
+            case 58:
+                tokens.Add(Classe.pt_v);
+                //tokens.Add(Classe.id);
+                //tokens.Add(Classe.num);
+                //tokens.Add(Classe.OPRD);
+                break;
+        }
+
+        return tokens;
+    }
 }

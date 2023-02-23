@@ -7,14 +7,14 @@ namespace CompiladorMgol.C_Semantico;
 
 public class GeradorDeCodigoFinal
 {
+    public static bool HasError = false;
     private StreamWriter writer;
-
     private Logging log_erros;
     private Logging log_codigo;
     private Logging log_variaveis;
     private Logging log_temporarias;
     private Logging log_cabecalho;
-    
+
     public GeradorDeCodigoFinal()
     {
         ObterArquivoEscritaFinal();
@@ -36,8 +36,8 @@ public class GeradorDeCodigoFinal
             File.Delete(filePath);
 
         writer = new StreamWriter(File.Create(filePath));
-        
-        
+
+
     }
 
     public void ImprimeRegra5()
@@ -56,7 +56,7 @@ public class GeradorDeCodigoFinal
     {
         log_variaveis.LogMeioDaLinha(variaveis);
     }
-    
+
     public void ImprimeArquivoFinal(string msg) => log_codigo.Log(msg);
 
     public void QuebraDeLinha() => log_codigo.LogQuebraDeLinha();
@@ -69,7 +69,7 @@ public class GeradorDeCodigoFinal
         log_temporarias.Log(t);
         log_temporarias.LogQuebraDeLinha();
     }
-    
+
     public void ImprimeErroVariavelNaoDeclarada(int linha, int coluna)
     {
         log_erros.LogErrors($"ERRO: Variável não declarada. Linha: {linha} - Coluna: {coluna}");
@@ -90,6 +90,7 @@ public class GeradorDeCodigoFinal
         ImprimeCabecalho();
         ImprimeVariaveisTemporarias();
         ImprimeCorpoCodigo();
+        ImprimeSaidaConsole();
         writer.Flush();
         writer.Close();
     }
@@ -98,30 +99,50 @@ public class GeradorDeCodigoFinal
     {
         log_cabecalho.Log("#include <stdio.h>\n");
         log_cabecalho.LogQuebraDeLinha();
-        log_cabecalho.Log("typedef literal char[256];\n");
+        log_cabecalho.Log("typedef char literal[256];\n");
         log_cabecalho.LogQuebraDeLinha();
         log_cabecalho.Log("void main(void) {\n");
         log_cabecalho.LogQuebraDeLinha();
-        writer.WriteLine(log_cabecalho.ToString());
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine(log_cabecalho.ToString());
+        if (!HasError)
+            writer.WriteLine(log_cabecalho.ToString());
+        
     }
 
     private void ImprimeVariaveisTemporarias()
-    {   
-        log_temporarias.Log("\\****************************\\ \n");
-        log_temporarias.LogQuebraDeLinha();
-        writer.WriteLine(log_temporarias.ToString());
-        writer.WriteLine(log_variaveis.ToString());
-        Console.WriteLine(log_temporarias.ToString());
-        Console.WriteLine(log_variaveis.ToString());
+    {
+            log_temporarias.Log("/****************************/ \n");
+            log_temporarias.LogQuebraDeLinha();
+        if (!HasError)
+        {
+            writer.WriteLine(log_temporarias.ToString());
+            writer.WriteLine(log_variaveis.ToString());
+            
+        }
     }
 
     private void ImprimeCorpoCodigo()
     {
-        log_codigo.Log("\n}");
-        log_codigo.LogQuebraDeLinha();
-        writer.Write(log_codigo.ToString());
+            log_codigo.Log("\n}");
+            log_codigo.LogQuebraDeLinha();
+        if (!HasError)
+        {
+            writer.Write(log_codigo.ToString());
+        }
+    }
+
+    private void ImprimeSaidaConsole()
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("-------------ERROS: ----");
+        Console.WriteLine(log_erros.Linha);
+        Console.ResetColor();
+
+        Console.WriteLine("----->>>>> Código gerado: ");
+
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine(log_cabecalho.ToString());
+        Console.WriteLine(log_temporarias.ToString());
+        Console.WriteLine(log_variaveis.ToString());
         Console.WriteLine(log_codigo.ToString());
     }
 }

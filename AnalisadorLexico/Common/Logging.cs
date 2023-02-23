@@ -11,6 +11,9 @@ namespace CompiladorMgol.Common
         private StringBuilder linha;
         private StringBuilder completo;
 
+        public String Linha { get { return linha.ToString(); } }
+        public String Completo { get { return completo.ToString(); } }
+
         public Logging()
         {
             this.linha = new();
@@ -32,7 +35,7 @@ namespace CompiladorMgol.Common
 
         public void LogErrors(string msg)
         {
-            
+            completo.AppendLine(msg);
         }
 
         /// <summary>
@@ -45,6 +48,9 @@ namespace CompiladorMgol.Common
             var p = posicao >= 0 ? posicao : 0;
             linha.Insert(p, ""+vari);
         }
+
+        
+
         
         public override string ToString()
         {
